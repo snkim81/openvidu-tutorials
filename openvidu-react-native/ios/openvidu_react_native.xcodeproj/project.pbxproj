@@ -716,7 +716,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.openvidu-react-";
+				PRODUCT_BUNDLE_IDENTIFIER = openvidu.io.reactnative;
 				PRODUCT_NAME = openvidu_react_native;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -739,7 +739,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.openvidu-react-";
+				PRODUCT_BUNDLE_IDENTIFIER = openvidu.io.reactnative;
 				PRODUCT_NAME = openvidu_react_native;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

@@ -31,6 +31,8 @@ export default class App extends Component<Props> {
         this.state = {
             mySessionId: 'testReact',
             myUserName: 'Participant' + Math.floor(Math.random() * 100),
+            subscribersSecondsTimeout: 0,
+            subscribersNum: 0,
             session: undefined,
             mainStreamManager: undefined,
             subscribers: [],
@@ -113,13 +115,22 @@ export default class App extends Component<Props> {
                 mySession.on('streamCreated', async (event) => {
                     // Subscribe to the Stream to receive it. Second parameter is undefined
                     // so OpenVidu doesn't create an HTML video by its own
-                    const subscriber = await mySession.subscribeAsync(event.stream, undefined);
-                    var subscribers = Array.from(this.state.subscribers);
-                    subscribers.push(subscriber);
-                    // Update the state with the new subscribers
+
                     this.setState({
-                        subscribers: subscribers,
+                        subscribersNum: this.state.subscribersNum + 1,
+                    }, async () => {
+                        setTimeout(async () => {
+                            const subscriber = await mySession.subscribeAsync(event.stream, undefined);
+                            var subscribers = Array.from(this.state.subscribers);
+                            subscribers.push(subscriber);
+                            // Update the state with the new subscribers
+                            this.setState({
+                                subscribers: subscribers,
+                            });
+                        }, this.state.subscribersSecondsTimeout * this.state.subscribersNum * 1000);
                     });
+
+
                 });
 
                 // On every Stream destroyed...
@@ -127,6 +138,7 @@ export default class App extends Component<Props> {
                     event.preventDefault();
                     // Remove the stream from 'subscribers' array
                     this.deleteSubscriber(event.stream);
+                    this.setState({subscribersNum: this.state.subscribersNum - 1});
                 });
 
                 // --- 4) Connect to the session with a valid user token ---
@@ -176,9 +188,11 @@ export default class App extends Component<Props> {
 
     getNicknameTag(stream) {
         // Gets the nickName of the user
-        if (stream.connection && JSON.parse(stream.connection.data) && JSON.parse(stream.connection.data).clientData) {
-            return JSON.parse(stream.connection.data).clientData;
-        }
+        try {
+            if (stream.connection && JSON.parse(stream.connection.data) && JSON.parse(stream.connection.data).clientData) {
+                return JSON.parse(stream.connection.data).clientData;
+            }
+        } catch (error) { }
         return '';
     }
 
@@ -207,8 +221,10 @@ export default class App extends Component<Props> {
             this.OV = null;
             this.setState({
                 session: undefined,
+                subscribersSecondsTimeout: 0,
+                subscribersNum: 0,
                 subscribers: [],
-                mySessionId: 'SessionA',
+                mySessionId: 'testReact',
                 myUserName: 'Participant' + Math.floor(Math.random() * 100),
                 mainStreamManager: undefined,
                 publisher: undefined,
@@ -337,6 +353,13 @@ export default class App extends Component<Props> {
                                 style={{  width: '90%', height: 40, borderColor: 'gray', borderWidth: 1 }}
                                 onChangeText={(mySessionId) => this.setState({ mySessionId })}
                                 value={this.state.mySessionId}
+                            />
+                            <Text>Seconds between subscibers</Text>
+                            <TextInput
+                                style={{  width: '90%', height: 40, borderColor: 'gray', borderWidth: 1 }}
+                                keyboardType='numeric'
+                                onChangeText={(subscribersSecondsTimeout) => this.setState({ subscribersSecondsTimeout })}
+                                value={this.state.subscribersSecondsTimeout}
                             />
                         </View>
 
