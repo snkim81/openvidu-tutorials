@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, HostListener, OnDestroy } from '@angular/core';
-import { OpenVidu, Publisher, Session, StreamEvent, StreamManager, Subscriber } from 'openvidu-browser';
+import { NetworkQualityLevelChangedEvent, OpenVidu, Publisher, Session, StreamEvent, StreamManager, Subscriber } from 'openvidu-browser';
 import { throwError as observableThrowError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -71,6 +71,22 @@ export class AppComponent implements OnDestroy {
       // Remove the stream from 'subscribers' array
       this.deleteSubscriber(event.stream.streamManager);
     });
+
+    this.session.on('networkQualityLevelChanged',( event: NetworkQualityLevelChangedEvent) => {
+
+      if (event.connection.connectionId === this.session.connection.connectionId) {
+          console.warn("Now my network quality level is " + event.newValue + ". Before was " + event.oldValue);
+
+          // Do stuff
+
+      } else {
+          console.warn("Network quality level of connection " + event.connection.connectionId
+              + " is " + event.newValue + ". Previous one was " + event.oldValue);
+
+          // Do stuff
+
+      }
+  });
 
     // --- 4) Connect to the session with a valid user token ---
 
